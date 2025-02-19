@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            display: block;
+            margin-top: 2px;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+        }
+        textarea, select, input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            display: block;
+        }
+        button {
+            margin-top: 10px;
+        }
+        #previewSection {
+            background: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Contact Us</h2>
+
+    <!-- Step 1: GET Form for Preview -->
+    <form id="contactForm" method="GET">
+        <label>Name:</label>
+        <input type="text" id="userName" name="name">
+        <span class="error-message" id="nameError"></span>
+
+        <label>Email:</label>
+        <input type="email" id="userEmail" name="email">
+        <span class="error-message" id="emailError"></span>
+
+        <label>Phone Number:</label>
+        <input type="tel" id="userPhone" name="phone">
+        <span class="error-message" id="phoneError"></span>
+
+        <label>Message:</label>
+        <textarea id="userMessage" name="message"></textarea>
+        <span class="error-message" id="messageError"></span>
+
+        <label>Preferred Contact Method:</label>
+        <div>
+            <input type="radio" name="contactMethod" value="Email"> Email
+            <input type="radio" name="contactMethod" value="Phone"> Phone
+            <input type="radio" name="contactMethod" value="Both"> Both
+        </div>
+        <span class="error-message" id="contactError"></span>
+
+        <label>Inquiry Type:</label>
+        <select name="inquiryType" id="inquiryCategory">
+            <option value="">Select an option</option>
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Support Request">Support Request</option>
+            <option value="Feedback">Feedback</option>
+        </select>
+        <span class="error-message" id="inquiryError"></span>
+
+        <button type="submit" id="submitButton">Submit</button>
+    </form>
+
+    <!-- Preview Section -->
+    <div id="previewSection"></div>
+
+    <!-- Step 2: POST Form for Final Submission -->
+    <form id="confirmSubmissionForm" method="POST" action="submit.php" style="display: none;">
+        <button type="submit">Confirm & Submit</button>
+    </form>
+</div>
+
+<script>
+    function getFormData() {
+        const formData = new URLSearchParams(window.location.search);
+        return {
+            name: formData.get("name") || "",
+            email: formData.get("email") || "",
+            phone: formData.get("phone") || "",
+            message: formData.get("message") || "",
+            inquiryType: formData.get("inquiryType") || "",
+            contactMethod: formData.get("contactMethod") || "",
+        };
+    }
+
+    function validateUserInput() {
+        let isValid = true;
+        document.querySelectorAll('.error-message').forEach(errorMsg => errorMsg.textContent = '');
+
+        let userName = document.getElementById("userName").value.trim();
+        let userEmail = document.getElementById("userEmail").value.trim();
+        let userPhone = document.getElementById("userPhone").value.trim();
+        let userMessage = document.getElementById("userMessage").value.trim();
+        let inquiryCategory = document.getElementById("inquiryCategory").value;
+        let contactMethod = document.querySelector('input[name="contactMethod"]:checked');
+
+        if (!userName) {
+            document.getElementById("nameError").textContent = "Name is required.";
+            isValid = false;
+        }
+
+        if (!userEmail || !/^\S+@\S+\.\S+$/.test(userEmail)) {
+            document.getElementById("emailError").textContent = "Enter a valid email.";
+            isValid = false;
+        }
+
+        if (!userPhone || !/^\d{10}$/.test(userPhone)) {
+            document.getElementById("phoneError").textContent = "Enter a 10-digit phone number.";
+            isValid = false;
+        }
+
+        if (!userMessage) {
+            document.getElementById("messageError").textContent = "Message cannot be empty.";
+            isValid = false;
+        }
+
+        if (!contactMethod) {
+            document.getElementById("contactError").textContent = "Select a contact method.";
+            isValid = false;
+        }
+
+        if (!inquiryCategory) {
+            document.getElementById("inquiryError").textContent = "Select an inquiry type.";
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+        if (!validateUserInput()) {
+            event.preventDefault();
+            return;
+        }
+    });
+
+    window.onload = function () {
+        const formData = getFormData();
+
+        if (formData.name || formData.email || formData.phone || formData.message) {
+            let previewSection = document.getElementById("previewSection");
+            previewSection.innerHTML = `
+                <h3>Preview:</h3>
+                <p><strong>Name:</strong> ${formData.name}</p>
+                <p><strong>Email:</strong> ${formData.email}</p>
+                <p><strong>Phone:</strong> ${formData.phone}</p>
+                <p><strong>Message:</strong> ${formData.message}</p>
+                <p><strong>Contact Method:</strong> ${formData.contactMethod || 'Not selected'}</p>
+                <p><strong>Inquiry Type:</strong> ${formData.inquiryType}</p>
+            `;
+            previewSection.style.display = "block";
+
+            // Hide the Submit button once the preview is shown
+            document.getElementById("submitButton").style.display = "none";
+
+            // Show the Confirm & Submit button
+            document.getElementById("confirmSubmissionForm").style.display = "block";
+        }
+    };
+</script>
+
+</body>
+</html>
