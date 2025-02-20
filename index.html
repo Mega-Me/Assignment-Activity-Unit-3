@@ -9,12 +9,6 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        .error-message {
-            color: red;
-            font-size: 0.9em;
-            display: block;
-            margin-top: 2px;
-        }
         .form-container {
             max-width: 400px;
             margin: auto;
@@ -45,37 +39,34 @@
     <!-- Step 1: GET Form for Preview -->
     <form id="contactForm" method="GET">
         <label>Name:</label>
-        <input type="text" id="userName" name="name">
-        <span class="error-message" id="nameError"></span>
+        <input type="text" id="userName" name="name" required>
 
         <label>Email:</label>
-        <input type="email" id="userEmail" name="email">
-        <span class="error-message" id="emailError"></span>
+        <input type="email" id="userEmail" name="email" 
+            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" 
+            title="Enter a valid email address (e.g., user@example.com)" required>
 
         <label>Phone Number:</label>
-        <input type="tel" id="userPhone" name="phone">
-        <span class="error-message" id="phoneError"></span>
+        <input type="tel" id="userPhone" name="phone" pattern="^\d{10}$" required 
+            title="Enter a 10-digit phone number">
 
         <label>Message:</label>
-        <textarea id="userMessage" name="message"></textarea>
-        <span class="error-message" id="messageError"></span>
+        <textarea id="userMessage" name="message" required></textarea>
 
         <label>Preferred Contact Method:</label>
         <div>
-            <input type="radio" name="contactMethod" value="Email"> Email
+            <input type="radio" name="contactMethod" value="Email" required> Email
             <input type="radio" name="contactMethod" value="Phone"> Phone
             <input type="radio" name="contactMethod" value="Both"> Both
         </div>
-        <span class="error-message" id="contactError"></span>
 
         <label>Inquiry Type:</label>
-        <select name="inquiryType" id="inquiryCategory">
+        <select name="inquiryType" id="inquiryCategory" required>
             <option value="">Select an option</option>
             <option value="General Inquiry">General Inquiry</option>
             <option value="Support Request">Support Request</option>
             <option value="Feedback">Feedback</option>
         </select>
-        <span class="error-message" id="inquiryError"></span>
 
         <button type="submit" id="submitButton">Submit</button>
     </form>
@@ -101,57 +92,6 @@
             contactMethod: formData.get("contactMethod") || "",
         };
     }
-
-    function validateUserInput() {
-        let isValid = true;
-        document.querySelectorAll('.error-message').forEach(errorMsg => errorMsg.textContent = '');
-
-        let userName = document.getElementById("userName").value.trim();
-        let userEmail = document.getElementById("userEmail").value.trim();
-        let userPhone = document.getElementById("userPhone").value.trim();
-        let userMessage = document.getElementById("userMessage").value.trim();
-        let inquiryCategory = document.getElementById("inquiryCategory").value;
-        let contactMethod = document.querySelector('input[name="contactMethod"]:checked');
-
-        if (!userName) {
-            document.getElementById("nameError").textContent = "Name is required.";
-            isValid = false;
-        }
-
-        if (!userEmail || !/^\S+@\S+\.\S+$/.test(userEmail)) {
-            document.getElementById("emailError").textContent = "Enter a valid email.";
-            isValid = false;
-        }
-
-        if (!userPhone || !/^\d{10}$/.test(userPhone)) {
-            document.getElementById("phoneError").textContent = "Enter a 10-digit phone number.";
-            isValid = false;
-        }
-
-        if (!userMessage) {
-            document.getElementById("messageError").textContent = "Message cannot be empty.";
-            isValid = false;
-        }
-
-        if (!contactMethod) {
-            document.getElementById("contactError").textContent = "Select a contact method.";
-            isValid = false;
-        }
-
-        if (!inquiryCategory) {
-            document.getElementById("inquiryError").textContent = "Select an inquiry type.";
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    document.getElementById("contactForm").addEventListener("submit", function(event) {
-        if (!validateUserInput()) {
-            event.preventDefault();
-            return;
-        }
-    });
 
     window.onload = function () {
         const formData = getFormData();
